@@ -1,4 +1,7 @@
 from rest_framework import viewsets, permissions
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import Profile, Document
 from .serializers import ProfileSerializer, DocumentSerializer
 
@@ -25,8 +28,17 @@ class DocumentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def get_queryset(self):
-        return Document.objects.filter(owner=self.request.user)
+        qs = Document.objects.filter(owner=self.request.user)
+        kind = self.request.query_params.get("kind")
+        if kind:
+            qs = qs.filter(kind=kind)
+        return qs
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+
+@api_view(["GET"])
+@ensure_csrf_cookie
+def csrf_ping(_request):
+    return Response({"ok": True})

@@ -1,30 +1,29 @@
-import { useEffect, useState } from 'react'
-
-type Health = { ok: boolean } | null
+import { Link, NavLink, Outlet } from 'react-router-dom'
+import { useEffect } from 'react'
+import { api } from './lib/api'
 
 function App() {
-  const [health, setHealth] = useState<Health>(null)
-
   useEffect(() => {
-    // Placeholder ping; replace with backend health endpoint when available
-    setHealth({ ok: true })
+    api.get('/core/csrf/').catch(() => {})
   }, [])
-
   return (
-    <div style={{ padding: 24, fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif' }}>
-      <h1>Job Scrapper</h1>
-      <p>Deep job search and auto-application platform.</p>
-      <div>
-        <strong>Backend:</strong> {health ? (health.ok ? 'OK' : 'Down') : '…'}
-      </div>
-      <ul>
-        <li>View sources and configure adapters</li>
-        <li>Review matched jobs and tailored docs</li>
-        <li>Queue and monitor applications</li>
-      </ul>
+    <div className="min-h-screen">
+      <header className="border-b">
+        <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
+          <Link to="/" className="font-semibold tracking-tight">Job Scrapper</Link>
+          <nav className="flex items-center gap-6 text-sm">
+            <NavLink to="/sources" className={({isActive}) => isActive ? 'text-primary font-medium' : 'text-muted-foreground hover:text-foreground'}>Sources</NavLink>
+            <NavLink to="/jobs" className={({isActive}) => isActive ? 'text-primary font-medium' : 'text-muted-foreground hover:text-foreground'}>Jobs</NavLink>
+            <NavLink to="/applications" className={({isActive}) => isActive ? 'text-primary font-medium' : 'text-muted-foreground hover:text-foreground'}>Applications</NavLink>
+            <NavLink to="/documents" className={({isActive}) => isActive ? 'text-primary font-medium' : 'text-muted-foreground hover:text-foreground'}>Documents</NavLink>
+          </nav>
+        </div>
+      </header>
+      <main className="mx-auto max-w-6xl px-6 py-8">
+        <Outlet />
+      </main>
     </div>
   )
 }
 
 export default App
-

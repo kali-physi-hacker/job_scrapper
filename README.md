@@ -9,6 +9,7 @@ Important note: “100% acceptance” is not realistic. This project focuses on 
 Key Features
 
 - Multi‑source discovery: APIs where available (e.g., Greenhouse, Lever), scraping via Playwright for others, RSS/feeds, and email parsing.
+  - Adapters included: greenhouse, lever, smartrecruiters, workable, recruitee (basic); stubs for ashby, workday.
 - Normalization pipeline: Canonical job schema, dedupe, entity resolution (companies/sites), spam and expired posting filtering.
 - Matching & scoring: Skill extraction, semantic similarity, rule weights, and learning from outcomes (bandit/weighted heuristics).
 - Tailored documents: Role‑aware resume variants, ATS‑optimized formatting, targeted cover letters with evidence from projects.
@@ -63,3 +64,40 @@ Roadmap (High Level)
 - v1: Playwright RPA fallback, tailored docs, scoring, analytics
 - v2: Learning loop (bandit), A/B tests, connector marketplace, multi‑tenant
 
+How To Use
+
+- Start here: docs/setup.md — environment and run instructions
+- Then follow: docs/usage.md — step‑by‑step UI and API workflows
+  - Upload resumes and manage keywords
+  - Add sources (single, bulk, or discover by company slugs)
+  - Crawl, score, and fetch Top Matches
+  - Prepare applications, tailor cover letters/resumes
+  - Apply (dry‑run by default) and review attempts and evidence
+
+MVP Runbook
+
+- Backend
+  - Create `.env` from `backend/.env.example`. Keep `APPLY_REAL=False` for dry-run submissions.
+  - `python -m venv .venv && source .venv/bin/activate && pip install -r backend/requirements.txt`
+  - `python backend/manage.py makemigrations && python backend/manage.py migrate`
+  - `python backend/manage.py createsuperuser && python backend/manage.py runserver`
+  - In separate shells: `celery -A config.celery_app worker -l info` and `celery -A config.celery_app beat -l info`
+
+- Frontend
+  - `cd frontend && cp .env.example .env && npm install && npm run dev`
+  - Log in at `/admin` to establish a session in the same browser.
+
+- Workflow
+  1) Documents: Upload a resume (set keywords) at `/documents`.
+  2) Sources: Add a Greenhouse/Lever board and click “Crawl”.
+  3) Jobs: Use filters or “Top Matches”, select a default resume, click “Prepare Apply”, then “Tailor Cover”.
+  4) Applications: Review prepared/submitted apps and attempt logs (dry-run evidence).
+
+Notes
+
+- Submissions are dry-run until `APPLY_REAL=True`. Use with caution and respect site ToS.
+- In dev, media uploads are served via Django when `DEBUG=True`.
+4) Seed Sources (120 placeholders)
+
+- `python backend/manage.py seed_sources --file data/sources.csv`
+- Or use the Bulk Add form in the Sources page (paste URLs, auto-detects platform).

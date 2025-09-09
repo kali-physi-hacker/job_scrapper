@@ -13,6 +13,7 @@ env = environ.Env(
     REDIS_URL=(str, "redis://localhost:6379/0"),
     CORS_ALLOWED_ORIGINS=(list, []),
     FRONTEND_URL=(str, "http://localhost:5173"),
+    APPLY_REAL=(bool, False),
 )
 
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
@@ -112,3 +113,5 @@ CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_TASK_ALWAYS_EAGER = False
 CELERY_TIMEZONE = TIME_ZONE
 
+# Application settings
+APPLY_REAL = env("APPLY_REAL")
